@@ -55,9 +55,9 @@ st.markdown(
 
 # -----------------------------
 # Built-in template (users won't upload)
-# Put your template here: assets/template.xlsx
+# Put your template here: assets/template_view_reports.xlsx
 # -----------------------------
-TEMPLATE_PATH = Path("assets/template.xlsx")
+TEMPLATE_PATH = Path("assets/template_view_reports.xlsx")
 
 if not TEMPLATE_PATH.exists():
     st.error(
