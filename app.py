@@ -6,46 +6,53 @@ import streamlit as st
 from processor import run_pipeline_and_zip, previous_month_str
 
 # -----------------------------
-# Config
+# Page config
 # -----------------------------
-LOGO_PATH = Path("assets/logo.png")  # optional (favicon already set by you)
-TEMPLATE_PATH = Path("assets/template_view_reports.xlsx")
-
 st.set_page_config(
     page_title="View Reports Processor",
-    page_icon="📊",  # keep your logo favicon if you already set it elsewhere
+    page_icon=Path("assets/logo.png"),
     layout="centered",
 )
 
+# -----------------------------
+# Paths (keep your template name)
+# -----------------------------
+LOGO_PATH = Path("assets/logo.png")  # optional: shown in header if exists
+TEMPLATE_PATH = Path("assets/template_view_reports.xlsx")
+
 if not TEMPLATE_PATH.exists():
-    st.error("Missing template: `assets/template_view_reports.xlsx`")
+    st.error(
+        "Template file not found. Please add it to the repo at "
+        "`assets/template_view_reports.xlsx` and redeploy the app."
+    )
     st.stop()
 
 TEMPLATE_BYTES = TEMPLATE_PATH.read_bytes()
 
 # -----------------------------
-# Styling
+# Styling (more professional "app shell")
 # -----------------------------
 st.markdown(
     """
     <style>
-      /* Hide Streamlit chrome (optional; keep if you want) */
+      /* Hide Streamlit chrome */
       #MainMenu {visibility: hidden;}
       footer {visibility: hidden;}
       header {visibility: hidden;}
 
       /* App background */
       [data-testid="stAppViewContainer"] {
-        background: radial-gradient(1200px 600px at 20% -10%, rgba(31,79,216,0.10), rgba(255,255,255,0) 60%),
-                    radial-gradient(1000px 700px at 90% 10%, rgba(34,197,94,0.08), rgba(255,255,255,0) 55%),
-                    linear-gradient(180deg, rgba(250,250,252,1), rgba(255,255,255,1));
+        background:
+          radial-gradient(1200px 600px at 20% -10%, rgba(31,79,216,0.10), rgba(255,255,255,0) 60%),
+          radial-gradient(1000px 700px at 90% 10%, rgba(34,197,94,0.08), rgba(255,255,255,0) 55%),
+          linear-gradient(180deg, rgba(250,250,252,1), rgba(255,255,255,1));
       }
 
-      /* Layout container */
+      /* Page container */
       .block-container {
-        max-width: 980px;
         padding-top: 2.0rem;
         padding-bottom: 2.0rem;
+        max-width: 980px;
       }
 
       /* Typography */
@@ -53,17 +60,17 @@ st.markdown(
         font-size: 2.05rem;
         font-weight: 900;
         letter-spacing: -0.03em;
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.15rem;
       }
       .muted { color: rgba(49, 51, 63, 0.72); }
-      .tiny { font-size: 0.82rem; color: rgba(49, 51, 63, 0.65); }
+      .tiny  { font-size: 0.82rem; color: rgba(49, 51, 63, 0.65); }
 
       /* Cards */
       .card {
         border: 1px solid rgba(49, 51, 63, 0.14);
         border-radius: 18px;
         padding: 16px 18px;
-        background: rgba(255,255,255,0.70);
+        background: rgba(255,255,255,0.72);
         backdrop-filter: blur(6px);
         box-shadow: 0 6px 22px rgba(0,0,0,0.04);
       }
@@ -73,7 +80,11 @@ st.markdown(
         margin: 0 0 0.35rem 0;
       }
 
-      /* Button */
+      /* Inputs */
+      .stFileUploader label { font-weight: 750; }
+      .stCheckbox label { font-weight: 650; }
+
+      /* Primary action button (Process) */
       .stButton button[kind="primary"]{
         background: linear-gradient(180deg, #1f4fd8, #1a3fa8);
         color: white;
@@ -87,9 +98,12 @@ st.markdown(
         color: white;
       }
 
-      /* Inputs */
-      .stFileUploader label { font-weight: 750; }
-      .stDownloadButton button { border-radius: 14px; font-weight: 800; padding: 0.66rem 1rem; }
+      /* Download button */
+      .stDownloadButton button{
+        border-radius: 14px;
+        font-weight: 800;
+        padding: 0.66rem 1rem;
+      }
 
       /* Status chip */
       .chip {
@@ -97,9 +111,22 @@ st.markdown(
         padding: 6px 10px;
         border-radius: 999px;
         border: 1px solid rgba(49,51,63,0.16);
-        background: rgba(255,255,255,0.6);
+        background: rgba(255,255,255,0.65);
         font-size: 0.85rem;
-        font-weight: 700;
+        font-weight: 750;
+      }
+
+      /* Subtle footer trademark */
+      .keshet-footer {
+        position: fixed;
+        bottom: 8px;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: 0.72rem;
+        color: rgba(49, 51, 63, 0.35);
+        pointer-events: none;
+        letter-spacing: 0.02em;
       }
     </style>
     """,
@@ -114,13 +141,13 @@ with colA:
     if LOGO_PATH.exists():
         st.image(str(LOGO_PATH), width=56)
     else:
-        st.write("")  # keep spacing
+        st.write("")
 
 with colB:
     st.title("View Reports Processor")
     st.markdown(
-        "<div class='muted'>Generate standardized monthly view reports from platform exports. "
-        "Upload files, choose month, process, and download results.</div>",
+        "<div class='muted'>Upload platform files and a mapping (KeshetTV) file. "
+        "Choose the output month, process, and download the ZIP.</div>",
         unsafe_allow_html=True,
     )
 
@@ -134,7 +161,7 @@ left, right = st.columns(2, gap="large")
 with left:
     st.markdown("<div class='card'>", unsafe_allow_html=True)
     st.markdown("<h2>Platform files</h2>", unsafe_allow_html=True)
-    st.markdown("<div class='muted'>Upload one or more Excel/CSV exports (multiple sheets supported).</div>", unsafe_allow_html=True)
+    st.markdown("<div class='muted'>Upload one or more platform Excel/CSV exports (multiple sheets supported).</div>", unsafe_allow_html=True)
     st.write("")
     platform_files = st.file_uploader(
         "Platform files",
@@ -146,8 +173,8 @@ with left:
 
 with right:
     st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.markdown("<h2>Mapping file (DB)</h2>", unsafe_allow_html=True)
-    st.markdown("<div class='muted'>Used to resolve HOUSE_NUMBER and program naming.</div>", unsafe_allow_html=True)
+    st.markdown("<h2>Mapping file (KeshetTV)</h2>", unsafe_allow_html=True)
+    st.markdown("<div class='muted'>Used to resolve HOUSE_NUMBER and platform program names.</div>", unsafe_allow_html=True)
     st.write("")
     db_file = st.file_uploader(
         "Mapping file",
@@ -160,17 +187,18 @@ with right:
 st.write("")
 
 # -----------------------------
-# Controls bar (month + options) in one line
+# Controls bar (month + options) – single row
 # -----------------------------
 st.markdown("<div class='card'>", unsafe_allow_html=True)
-c1, c2, c3 = st.columns([1.1, 1.0, 1.2], vertical_alignment="center")
+c1, c2, c3 = st.columns([1.15, 1.05, 1.2], vertical_alignment="center")
+
 with c1:
     st.markdown("**Output month**")
     chosen_date = st.date_input(
         "Month",
         value=date.today().replace(day=1),
         label_visibility="collapsed",
-        help="This month will be written into the template (B1) and the date column.",
+        help="This month will be written into the output files (template B1 + date column).",
     )
     selected_month_str = f"{chosen_date.month:02d}/{chosen_date.year}"
 
@@ -184,8 +212,10 @@ with c2:
 
 with c3:
     st.markdown("**Template**")
-    st.markdown(f"<span class='chip'>Using built-in template</span>", unsafe_allow_html=True)
+    st.markdown("<span class='chip'>Built-in template</span>", unsafe_allow_html=True)
     st.markdown(f"<div class='tiny'>Selected month: <b>{selected_month_str}</b></div>", unsafe_allow_html=True)
+    st.markdown("<div class='tiny'>assets/template_view_reports.xlsx</div>", unsafe_allow_html=True)
+
 st.markdown("</div>", unsafe_allow_html=True)
 
 st.write("")
@@ -193,17 +223,23 @@ st.write("")
 # -----------------------------
 # Run section
 # -----------------------------
+can_run = bool(platform_files) and (db_file is not None)
+
 st.markdown("<div class='card'>", unsafe_allow_html=True)
 r1, r2 = st.columns([1, 1], vertical_alignment="center")
+
 with r1:
     st.markdown("**Run**")
-    can_run = bool(platform_files) and (db_file is not None)
     st.markdown(
         f"<span class='chip'>{'Ready to process' if can_run else 'Waiting for files'}</span>",
         unsafe_allow_html=True,
     )
+
 with r2:
-    st.markdown("<div class='muted'>Click Process. The ZIP download will appear below.</div>", unsafe_allow_html=True)
+    st.markdown(
+        "<div class='muted'>Click <b>Process</b>. The ZIP download will appear below when ready.</div>",
+        unsafe_allow_html=True,
+    )
 
 process_clicked = st.button(
     "Process",
@@ -212,6 +248,8 @@ process_clicked = st.button(
     disabled=not can_run,
 )
 st.markdown("</div>", unsafe_allow_html=True)
+
+st.write("")
 
 # -----------------------------
 # Session state
@@ -225,7 +263,7 @@ if "result_summary" not in st.session_state:
 # Processing
 # -----------------------------
 if can_run and process_clicked:
-    with st.spinner("Processing..."):
+    with st.spinner("Processing files..."):
         platform_payload = [(f.name, f.getvalue()) for f in platform_files]
         result = run_pipeline_and_zip(
             platform_files=platform_payload,
@@ -234,16 +272,15 @@ if can_run and process_clicked:
             include_intermediate=include_intermediate,
             month_str=selected_month_str,
         )
+
     st.session_state["result_zip"] = result.zip_bytes
     st.session_state["result_summary"] = result.summary
 
-st.write("")
-
 # -----------------------------
-# Output
+# Results
 # -----------------------------
 if st.session_state["result_zip"]:
-    st.success("Done. Your ZIP is ready.")
+    st.success("Processing complete.")
     st.text(st.session_state["result_summary"])
 
     st.download_button(
@@ -253,21 +290,22 @@ if st.session_state["result_zip"]:
         mime="application/zip",
         use_container_width=True,
     )
+
+    with st.expander("What’s inside the ZIP?", expanded=False):
+        st.markdown(
+            "- Final outputs: `template_*.xlsx`\n"
+            "- Optional (if enabled): `cleaned_*.xlsx`, `mapped_*.xlsx`"
+        )
 else:
-    st.info("Upload files above, choose month, and click **Process**.")
+    st.info("Upload platform files + mapping (KeshetTV) file, choose month, then click **Process**.")
 
 # -----------------------------
-# Subtle footer trademark
+# Footer trademark
 # -----------------------------
 st.markdown(
     """
-    <div style="
-      margin-top: 24px;
-      text-align: center;
-      font-size: 0.75rem;
-      color: rgba(49,51,63,0.35);
-      letter-spacing: 0.02em;">
-      © Keshet Data Team
+    <div class="keshet-footer">
+      © Keshet Digital Data Team
     </div>
     """,
     unsafe_allow_html=True,
