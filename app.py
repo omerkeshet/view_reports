@@ -219,8 +219,8 @@ st.write("")
 st.markdown(
     """
     <div class="card">
-      <div class="card-sub">
-        Run the process — the ZIP download will appear below once completed.
+      <div class="muted" style="font-size: 0.9rem;">
+        Click <b>Process</b>. The ZIP download will appear below when ready.
       </div>
     </div>
     """,
