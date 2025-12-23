@@ -10,7 +10,7 @@ from processor import run_pipeline_and_zip, previous_month_str
 # -----------------------------
 st.set_page_config(
     page_title="View Reports Processor",
-    page_icon="📊",
+    page_icon="📊🤣",
     layout="centered",
 )
 
