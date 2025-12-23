@@ -1,1 +1,3 @@
-placeholder
+streamlit
+pandas
+openpyxl
