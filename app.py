@@ -134,7 +134,7 @@ TEMPLATE_BYTES = TEMPLATE_PATH.read_bytes()
 # -----------------------------
 st.title("View Reports Processor")
 st.markdown(
-    "<div class='muted'>Upload platform files and a mapping (DB) file. "
+    "<div class='muted'>Upload platform files and a mapping (KeshetTV) file. "
     "The report template is built in.</div>",
     unsafe_allow_html=True,
 )
@@ -171,7 +171,7 @@ platform_files = st.file_uploader(
 
 st.write("")
 
-st.markdown("### Mapping file (DB)")
+st.markdown("### Mapping file (KeshetTV)")
 st.markdown(
     "<div class='muted'>Used to resolve HOUSE_NUMBER and platform program names.</div>",
     unsafe_allow_html=True,
