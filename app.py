@@ -18,7 +18,7 @@ st.set_page_config(
 )
 
 if not TEMPLATE_PATH.exists():
-    st.error("Missing template: `assets/template.xlsx`")
+    st.error("Missing template: `assets/template_view_reports.xlsx`")
     st.stop()
 
 TEMPLATE_BYTES = TEMPLATE_PATH.read_bytes()
