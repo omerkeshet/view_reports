@@ -546,15 +546,15 @@ def run_pipeline_and_zip(
     db_excel_bytes: bytes,
     template_excel_bytes: bytes,
     include_intermediate: bool = False,
+    month_str: Optional[str] = None,   # NEW
 ) -> RunResult:
     cleaned = clean_input_files_to_excels(platform_files)
     mapped = map_house_numbers(cleaned, db_excel_bytes)
-    templated = fill_template_files(mapped, template_excel_bytes)
+    templated = fill_template_files(mapped, template_excel_bytes, prev_month=month_str)  # CHANGED
 
     # Build ZIP
     zip_buf = BytesIO()
     with zipfile.ZipFile(zip_buf, "w", compression=zipfile.ZIP_DEFLATED) as z:
-        # Final outputs always included
         for name, b in templated.items():
             z.writestr(name, b)
 
