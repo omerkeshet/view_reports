@@ -1,6 +1,7 @@
 # app.py
 from pathlib import Path
 import streamlit as st
+from datetime import date
 
 from processor import run_pipeline_and_zip, previous_month_str
 
@@ -144,13 +145,26 @@ st.write("")
 # Options
 # -----------------------------
 include_intermediate = False
+selected_month_str = previous_month_str()
+
 with st.expander("Options", expanded=False):
     include_intermediate = st.checkbox(
         "Include intermediate outputs (cleaned_*, mapped_*) in ZIP",
         value=False,
     )
-    st.caption(f"Template month (B1): **{previous_month_str()}**")
+
+    st.markdown("**Output month (written into the template)**")
+    # pick any day within the month; we'll format it as MM/YYYY
+    chosen_date = st.date_input(
+        "Month",
+        value=date.today().replace(day=1),
+        help="Choose the month that will be written into the output files (template cell B1 and date column).",
+    )
+    selected_month_str = f"{chosen_date.month:02d}/{chosen_date.year}"
+
+    st.caption(f"Selected month: **{selected_month_str}**")
     st.caption("Template source: `assets/template.xlsx`")
+
 
 st.write("")
 
@@ -197,6 +211,7 @@ if can_run and process_clicked:
             db_excel_bytes=db_file.getvalue(),
             template_excel_bytes=TEMPLATE_BYTES,
             include_intermediate=include_intermediate,
+            month_str=selected_month_str,   # NEW
         )
 
     st.session_state["result_zip"] = result.zip_bytes
