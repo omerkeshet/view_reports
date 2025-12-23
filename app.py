@@ -24,14 +24,9 @@ st.markdown(
     """
     <style>
       /* Hide Streamlit chrome */
-      /* Hide Streamlit branding & chrome */
-      #MainMenu {display: none;}
-      header {display: none;}
-      footer {display: none;}
-        
-      /* Extra safety for Community Cloud footer */
-      div[data-testid="stFooter"] {display: none;}
-      div[data-testid="stToolbar"] {display: none;}
+      #MainMenu {visibility: hidden;}
+      footer {visibility: hidden;}
+      header {visibility: hidden;}
 
       /* Page container */
       .block-container {
