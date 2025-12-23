@@ -219,8 +219,9 @@ st.write("")
 st.markdown(
     """
     <div class="card">
-      <div class="card-title">Run</div>
-      <div class="card-sub">After processing, a ZIP download will appear below.</div>
+      <div class="card-sub">
+        Run the process — the ZIP download will appear below once completed.
+      </div>
     </div>
     """,
     unsafe_allow_html=True,
@@ -285,7 +286,7 @@ if st.session_state["result_zip"]:
             "- Optional (if enabled): `cleaned_*.xlsx`, `mapped_*.xlsx`"
         )
 else:
-    st.info("Upload platform files + mapping (DB) file, then click **Process**.")
+    st.info("Upload platform files + mapping (KeshetTV) file, then click **Process**.")
 
 
 st.markdown(
