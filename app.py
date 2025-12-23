@@ -9,7 +9,7 @@ from processor import run_pipeline_and_zip, previous_month_str
 # Config
 # -----------------------------
 LOGO_PATH = Path("assets/logo.png")  # optional (favicon already set by you)
-TEMPLATE_PATH = Path("assets/template.xlsx")
+TEMPLATE_PATH = Path("assets/template_view_reports.xlsx")
 
 st.set_page_config(
     page_title="View Reports Processor",
