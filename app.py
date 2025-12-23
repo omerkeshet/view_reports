@@ -89,10 +89,10 @@ st.markdown(
 # -----------------------------
 # Built-in template (users won't upload)
 # -----------------------------
-TEMPLATE_PATH = Path("assets/template.xlsx")
+TEMPLATE_PATH = Path("assets/template_view_reports.xlsx")
 if not TEMPLATE_PATH.exists():
     st.error(
-        "Template file not found. Please add it to the repo at `assets/template.xlsx` "
+        "Template file not found. Please add it to the repo at `assets/template_view_reports.xlsx` "
         "and redeploy the app."
     )
     st.stop()
