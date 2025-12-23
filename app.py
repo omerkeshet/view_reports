@@ -2,6 +2,9 @@
 from pathlib import Path
 import streamlit as st
 from datetime import date
+from pathlib import Path
+
+
 
 from processor import run_pipeline_and_zip, previous_month_str
 
@@ -10,7 +13,7 @@ from processor import run_pipeline_and_zip, previous_month_str
 # -----------------------------
 st.set_page_config(
     page_title="View Reports Processor",
-    page_icon="🤣",
+    page_icon=Path("assets/logo.png"),
     layout="centered",
 )
 
@@ -94,6 +97,19 @@ st.markdown(
        background: linear-gradient(180deg, #245ef5, #1f4fd8);
        color: white;
       }
+      /* Subtle footer trademark */
+     .keshet-footer {
+       position: fixed;
+       bottom: 8px;
+       left: 0;
+       right: 0;
+       text-align: center;
+       font-size: 0.72rem;
+       color: rgba(49, 51, 63, 0.35);
+       pointer-events: none;
+       letter-spacing: 0.02em;
+      }
+
 
     </style>
     """,
@@ -270,3 +286,13 @@ if st.session_state["result_zip"]:
         )
 else:
     st.info("Upload platform files + mapping (DB) file, then click **Process**.")
+
+
+st.markdown(
+    """
+    <div class="keshet-footer">
+      © Keshet Data Team
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
