@@ -3,7 +3,7 @@ from pathlib import Path
 from datetime import date
 import streamlit as st
 
-from processor import run_pipeline_and_zip, previous_month_str
+from processor import run_pipeline_and_zip
 
 # -----------------------------
 # Page config
@@ -15,22 +15,19 @@ st.set_page_config(
 )
 
 # -----------------------------
-# Paths (keep your template name)
+# Paths
 # -----------------------------
-LOGO_PATH = Path("assets/logo.png")  # optional: shown in header if exists
+LOGO_PATH = Path("assets/logo.png")
 TEMPLATE_PATH = Path("assets/template_view_reports.xlsx")
 
 if not TEMPLATE_PATH.exists():
-    st.error(
-        "Template file not found. Please add it to the repo at "
-        "`assets/template_view_reports.xlsx` and redeploy the app."
-    )
+    st.error("Template file not found: `assets/template_view_reports.xlsx`")
     st.stop()
 
 TEMPLATE_BYTES = TEMPLATE_PATH.read_bytes()
 
 # -----------------------------
-# Styling (more professional "app shell")
+# Styling
 # -----------------------------
 st.markdown(
     """
@@ -40,7 +37,7 @@ st.markdown(
       footer {visibility: hidden;}
       header {visibility: hidden;}
 
-      /* App background */
+      /* Background (subtle) */
       [data-testid="stAppViewContainer"] {
         background:
           radial-gradient(1200px 600px at 20% -10%, rgba(31,79,216,0.10), rgba(255,255,255,0) 60%),
@@ -55,36 +52,45 @@ st.markdown(
         max-width: 980px;
       }
 
-      /* Typography */
+      /* Normalize markdown spacing (this kills “random” gaps) */
+      .stMarkdown {margin: 0;}
+      .stMarkdown p {margin: 0.25rem 0 0 0;}
+
+      /* Title */
       h1 {
         font-size: 2.05rem;
         font-weight: 900;
         letter-spacing: -0.03em;
-        margin-bottom: 0.15rem;
+        margin: 0 0 0.2rem 0;
       }
+
       .muted { color: rgba(49, 51, 63, 0.72); }
       .tiny  { font-size: 0.82rem; color: rgba(49, 51, 63, 0.65); }
 
-      /* Cards */
+      /* Card */
       .card {
         border: 1px solid rgba(49, 51, 63, 0.14);
         border-radius: 18px;
         padding: 16px 18px;
-        background: rgba(255,255,255,0.72);
-        backdrop-filter: blur(6px);
+        background: rgba(255,255,255,0.86); /* more solid to avoid “seams” */
         box-shadow: 0 6px 22px rgba(0,0,0,0.04);
       }
-      .card h2 {
-        font-size: 1.05rem;
+
+      /* Consistent section label inside cards */
+      .label {
+        font-size: 0.96rem;
         font-weight: 850;
+        line-height: 1.15;
         margin: 0 0 0.35rem 0;
       }
 
-      /* Inputs */
-      .stFileUploader label { font-weight: 750; }
-      .stCheckbox label { font-weight: 650; }
+      .desc {
+        color: rgba(49, 51, 63, 0.72);
+        font-size: 0.95rem;
+        margin: 0 0 0.9rem 0;
+      }
 
-      /* Primary action button (Process) */
+      /* Primary Process button */
       .stButton button[kind="primary"]{
         background: linear-gradient(180deg, #1f4fd8, #1a3fa8);
         color: white;
@@ -98,7 +104,6 @@ st.markdown(
         color: white;
       }
 
-      /* Download button */
       .stDownloadButton button{
         border-radius: 14px;
         font-weight: 800;
@@ -111,12 +116,15 @@ st.markdown(
         padding: 6px 10px;
         border-radius: 999px;
         border: 1px solid rgba(49,51,63,0.16);
-        background: rgba(255,255,255,0.65);
+        background: rgba(255,255,255,0.70);
         font-size: 0.85rem;
         font-weight: 750;
       }
 
-      /* Subtle footer trademark */
+      /* Reduce vertical whitespace between Streamlit blocks */
+      div[data-testid="stVerticalBlock"] > div { margin-bottom: 0.85rem; }
+
+      /* Footer trademark */
       .keshet-footer {
         position: fixed;
         bottom: 8px;
@@ -134,35 +142,30 @@ st.markdown(
 )
 
 # -----------------------------
-# Header (app shell)
+# Header
 # -----------------------------
-colA, colB = st.columns([0.12, 0.88], vertical_alignment="center")
-with colA:
+c_logo, c_title = st.columns([0.12, 0.88], vertical_alignment="center")
+with c_logo:
     if LOGO_PATH.exists():
         st.image(str(LOGO_PATH), width=56)
-    else:
-        st.write("")
-
-with colB:
+with c_title:
     st.title("View Reports Processor")
     st.markdown(
-        "<div class='muted'>Upload platform files and a mapping (KeshetTV) file. "
-        "Choose the output month, process, and download the ZIP.</div>",
+        "<div class='muted'>Upload platform files and a mapping (KeshetTV) file. Choose the output month, process, and download the ZIP.</div>",
         unsafe_allow_html=True,
     )
 
 st.write("")
 
 # -----------------------------
-# Inputs (two cards)
+# Inputs cards
 # -----------------------------
 left, right = st.columns(2, gap="large")
 
 with left:
     st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.markdown("<h2>Platform files</h2>", unsafe_allow_html=True)
-    st.markdown("<div class='muted'>Upload one or more platform Excel/CSV exports (multiple sheets supported).</div>", unsafe_allow_html=True)
-    st.write("")
+    st.markdown("<div class='label'>Platform files</div>", unsafe_allow_html=True)
+    st.markdown("<div class='desc'>Upload one or more platform Excel/CSV exports (multiple sheets supported).</div>", unsafe_allow_html=True)
     platform_files = st.file_uploader(
         "Platform files",
         type=["xlsx", "xls", "csv"],
@@ -173,9 +176,8 @@ with left:
 
 with right:
     st.markdown("<div class='card'>", unsafe_allow_html=True)
-    st.markdown("<h2>Mapping file (KeshetTV)</h2>", unsafe_allow_html=True)
-    st.markdown("<div class='muted'>Used to resolve HOUSE_NUMBER and platform program names.</div>", unsafe_allow_html=True)
-    st.write("")
+    st.markdown("<div class='label'>Mapping file (KeshetTV)</div>", unsafe_allow_html=True)
+    st.markdown("<div class='desc'>Used to resolve HOUSE_NUMBER and platform program names.</div>", unsafe_allow_html=True)
     db_file = st.file_uploader(
         "Mapping file",
         type=["xlsx", "xls"],
@@ -187,13 +189,13 @@ with right:
 st.write("")
 
 # -----------------------------
-# Controls bar (month + options) – single row
+# Controls bar (aligned labels)
 # -----------------------------
 st.markdown("<div class='card'>", unsafe_allow_html=True)
-c1, c2, c3 = st.columns([1.15, 1.05, 1.2], vertical_alignment="center")
+k1, k2, k3 = st.columns([1.15, 1.05, 1.2], vertical_alignment="top")
 
-with c1:
-    st.markdown("**Output month**")
+with k1:
+    st.markdown("<div class='label'>Output month</div>", unsafe_allow_html=True)
     chosen_date = st.date_input(
         "Month",
         value=date.today().replace(day=1),
@@ -201,19 +203,19 @@ with c1:
         help="This month will be written into the output files (template B1 + date column).",
     )
     selected_month_str = f"{chosen_date.month:02d}/{chosen_date.year}"
+    st.markdown(f"<div class='tiny'>Selected: <b>{selected_month_str}</b></div>", unsafe_allow_html=True)
 
-with c2:
-    st.markdown("**Options**")
+with k2:
+    st.markdown("<div class='label'>Options</div>", unsafe_allow_html=True)
     include_intermediate = st.checkbox(
         "Include intermediate outputs",
         value=False,
         help="Adds cleaned_* and mapped_* files into the ZIP for troubleshooting.",
     )
 
-with c3:
-    st.markdown("**Template**")
+with k3:
+    st.markdown("<div class='label'>Template</div>", unsafe_allow_html=True)
     st.markdown("<span class='chip'>Built-in template</span>", unsafe_allow_html=True)
-    st.markdown(f"<div class='tiny'>Selected month: <b>{selected_month_str}</b></div>", unsafe_allow_html=True)
     st.markdown("<div class='tiny'>assets/template_view_reports.xlsx</div>", unsafe_allow_html=True)
 
 st.markdown("</div>", unsafe_allow_html=True)
@@ -227,17 +229,15 @@ can_run = bool(platform_files) and (db_file is not None)
 
 st.markdown("<div class='card'>", unsafe_allow_html=True)
 r1, r2 = st.columns([1, 1], vertical_alignment="center")
-
 with r1:
-    st.markdown("**Run**")
+    st.markdown("<div class='label'>Run</div>", unsafe_allow_html=True)
     st.markdown(
         f"<span class='chip'>{'Ready to process' if can_run else 'Waiting for files'}</span>",
         unsafe_allow_html=True,
     )
-
 with r2:
     st.markdown(
-        "<div class='muted'>Click <b>Process</b>. The ZIP download will appear below when ready.</div>",
+        "<div class='desc' style='margin:0;'>Click <b>Process</b>. The ZIP download will appear below when ready.</div>",
         unsafe_allow_html=True,
     )
 
@@ -272,7 +272,6 @@ if can_run and process_clicked:
             include_intermediate=include_intermediate,
             month_str=selected_month_str,
         )
-
     st.session_state["result_zip"] = result.zip_bytes
     st.session_state["result_summary"] = result.summary
 
@@ -282,7 +281,6 @@ if can_run and process_clicked:
 if st.session_state["result_zip"]:
     st.success("Processing complete.")
     st.text(st.session_state["result_summary"])
-
     st.download_button(
         label="Download results ZIP",
         data=st.session_state["result_zip"],
@@ -290,12 +288,6 @@ if st.session_state["result_zip"]:
         mime="application/zip",
         use_container_width=True,
     )
-
-    with st.expander("What’s inside the ZIP?", expanded=False):
-        st.markdown(
-            "- Final outputs: `template_*.xlsx`\n"
-            "- Optional (if enabled): `cleaned_*.xlsx`, `mapped_*.xlsx`"
-        )
 else:
     st.info("Upload platform files + mapping (KeshetTV) file, choose month, then click **Process**.")
 
