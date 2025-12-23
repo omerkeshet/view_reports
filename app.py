@@ -183,7 +183,7 @@ with left:
     with st.container(border=True):
         st.markdown("<div class='label'>Platform files</div>", unsafe_allow_html=True)
         st.markdown(
-            "<div class='desc'>Upload one or more platform Excel/CSV exports (multiple sheets supported).</div>",
+            "<div class='desc'>Upload one or more platform Excel/CSV exports.</div>",
             unsafe_allow_html=True,
         )
         platform_files = st.file_uploader(
