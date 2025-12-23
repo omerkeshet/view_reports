@@ -1,5 +1,4 @@
 import streamlit as st
-st.write("App loading...")
 
 from processor import run_pipeline_and_zip, previous_month_str
 
