@@ -10,12 +10,12 @@ from processor import run_pipeline_and_zip, previous_month_str
 # -----------------------------
 st.set_page_config(
     page_title="View Reports Processor",
-    page_icon="📊🤣",
+    page_icon="🤣",
     layout="centered",
 )
 
 # -----------------------------
-# Minimal "serious" styling (single-page)
+# Minimal styling (single-page)
 # -----------------------------
 st.markdown(
     """
@@ -82,6 +82,19 @@ st.markdown(
       .stCheckbox label {
         font-weight: 650;
       }
+      /* Primary action button (Process) */
+     .stButton button[kind="primary"] {
+       background: linear-gradient(180deg, #1f4fd8, #1a3fa8);
+       color: white;
+       border-radius: 14px;
+       border: none;
+      }
+    
+     .stButton button[kind="primary"]:hover {
+       background: linear-gradient(180deg, #245ef5, #1f4fd8);
+       color: white;
+      }
+
     </style>
     """,
     unsafe_allow_html=True,
@@ -127,16 +140,32 @@ st.markdown(
 
 st.write("")
 
+st.markdown("### Platform files")
+st.markdown(
+    "<div class='muted'>Upload one or more platform Excel / CSV files.</div>",
+    unsafe_allow_html=True,
+)
+
 platform_files = st.file_uploader(
-    "Platform files (Excel / CSV) — you can upload multiple",
+    "",
     type=["xlsx", "xls", "csv"],
     accept_multiple_files=True,
+    label_visibility="collapsed",
+)
+
+st.write("")
+
+st.markdown("### Mapping file (DB)")
+st.markdown(
+    "<div class='muted'>Used to resolve HOUSE_NUMBER and platform program names.</div>",
+    unsafe_allow_html=True,
 )
 
 db_file = st.file_uploader(
-    "Mapping file (DB Excel)",
+    "",
     type=["xlsx", "xls"],
     accept_multiple_files=False,
+    label_visibility="collapsed",
 )
 
 st.write("")
