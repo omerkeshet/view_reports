@@ -1,4 +1,5 @@
 import streamlit as st
+from pathlib import Path
 
 from processor import run_pipeline_and_zip, previous_month_str
 
@@ -21,11 +22,9 @@ db_file = st.file_uploader(
     accept_multiple_files=False,
 )
 
-template_file = st.file_uploader(
-    "Template file (Excel) – the formatted template to fill",
-    type=["xlsx", "xls"],
-    accept_multiple_files=False,
-)
+
+TEMPLATE_PATH = Path("assets/template.xlsx")
+template_excel_bytes = TEMPLATE_PATH.read_bytes()
 
 st.subheader("2) Options")
 include_intermediate = st.checkbox(
