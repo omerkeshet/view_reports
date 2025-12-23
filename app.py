@@ -137,30 +137,15 @@ st.markdown(
         letter-spacing: 0.02em;
       }
 
-      /* --- Kill the white "bubble" dropzones inside cards --- */
-    div[data-testid="stFileUploaderDropzone"] {
-      background: transparent !important;
-      border: 1px dashed rgba(49, 51, 63, 0.22) !important;
-      border-radius: 12px !important;
-      padding: 14px !important;
-    }
-    
-    div[data-testid="stFileUploaderDropzone"] * {
-      background: transparent !important;
-    }
-    
-    /* Remove extra rounded white container around uploader (varies by Streamlit version) */
-    section[data-testid="stFileUploaderDropzone"] {
-      background: transparent !important;
-    }
-    
-    /* Make drag-and-drop hint text less “bubble-like” */
-    div[data-testid="stFileUploaderDropzone"] p {
-      margin: 0 !important;
-      color: rgba(49, 51, 63, 0.70) !important;
+    /* Make Streamlit bordered containers look like your cards */
+    div[data-testid="stVerticalBlockBorderWrapper"]{
+      border: 1px solid rgba(49, 51, 63, 0.14) !important;
+      border-radius: 18px !important;
+      background: rgba(255,255,255,0.86) !important;
+      box-shadow: 0 6px 22px rgba(0,0,0,0.04) !important;
+      padding: 14px 16px !important;
     }
 
-      
     </style>
     """,
     unsafe_allow_html=True,
