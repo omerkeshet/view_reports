@@ -291,7 +291,7 @@ else:
 st.markdown(
     """
     <div class="keshet-footer">
-      © Keshet Data Team
+      © Keshet Digital Data Team
     </div>
     """,
     unsafe_allow_html=True,
