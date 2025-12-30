@@ -36,7 +36,7 @@ TEMPLATE_BYTES = TEMPLATE_PATH.read_bytes()
 # the processor distinguishes Sting VOD by filename containing "vod".
 # -----------------------------
 PLATFORM_CHOICES = [
-    " פלטפורמה...",
+    " Platform...",
     "פרטנר",
     "יס",
     "ScreenIL",
