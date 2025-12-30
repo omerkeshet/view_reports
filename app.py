@@ -36,7 +36,7 @@ TEMPLATE_BYTES = TEMPLATE_PATH.read_bytes()
 # the processor distinguishes Sting VOD by filename containing "vod".
 # -----------------------------
 PLATFORM_CHOICES = [
-    "בחר פלטפורמה...",
+    " פלטפורמה...",
     "פרטנר",
     "יס",
     "ScreenIL",
@@ -266,7 +266,7 @@ if platform_files:
                 )
                 platform_selection[f.name] = chosen
 
-            if chosen == "בחר פלטפורמה...":
+            if chosen == "Choose platform...":
                 all_assigned = False
 else:
     all_assigned = False
@@ -350,7 +350,7 @@ if can_run and process_clicked:
     with st.spinner("Processing files..."):
         platform_payload = []
         for f in platform_files:
-            chosen_platform = platform_selection.get(f.name, "בחר פלטפורמה...")
+            chosen_platform = platform_selection.get(f.name, "Choose platform...")
             token = PLATFORM_TOKEN.get(chosen_platform, "")
             base = Path(f.name).stem
             ext = Path(f.name).suffix
