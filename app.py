@@ -30,6 +30,33 @@ if not TEMPLATE_PATH.exists():
 TEMPLATE_BYTES = TEMPLATE_PATH.read_bytes()
 
 # -----------------------------
+# UI platform values (exact set you requested)
+# Note: "סטינג" appears twice in your message, but a selectbox can't have duplicate labels.
+# We keep one "סטינג" and add a "VOD file" checkbox when סטינג is selected, because
+# the processor distinguishes Sting VOD by filename containing "vod".
+# -----------------------------
+PLATFORM_CHOICES = [
+    "בחר פלטפורמה...",
+    "פרטנר",
+    "יס",
+    "ScreenIL",
+    "הוט",
+    "סלקום",
+    "סטינג",
+]
+
+# Tokens appended to filename so the processor logic keeps working as-is
+# (processor checks Hebrew substrings + lowercase "screenil" + "vod" keyword)
+PLATFORM_TOKEN = {
+    "פרטנר": "פרטנר",
+    "יס": "יס",
+    "ScreenIL": "screenil",  # processor checks "screenil" in lower()
+    "הוט": "הוט",
+    "סלקום": "סלקום",
+    "סטינג": "סטינג",
+}
+
+# -----------------------------
 # Styling
 # -----------------------------
 st.markdown(
@@ -168,7 +195,7 @@ with c_title:
     st.title("View Reports Processor")
     st.markdown(
         "<div class='muted'>Upload platform files and a mapping (KeshetTV) file. "
-        "Choose the output month, process, and download the ZIP.</div>",
+        "Assign a platform to each file, choose the output month, process, and download the ZIP.</div>",
         unsafe_allow_html=True,
     )
 
@@ -210,6 +237,43 @@ with right:
 st.write("")
 
 # -----------------------------
+# Per-file platform assignment
+# -----------------------------
+platform_selection: dict[str, str] = {}
+all_assigned = True
+
+if platform_files:
+    with st.container(border=True):
+        st.markdown("<div class='label'>Platform per file</div>", unsafe_allow_html=True)
+        st.markdown(
+            "<div class='desc'>Pick the platform for each uploaded file. "
+            "Behind the scenes we append the platform to the filename so the existing processing logic works unchanged.</div>",
+            unsafe_allow_html=True,
+        )
+
+        for f in platform_files:
+            row = st.columns([1.8, 1.0], vertical_alignment="center")
+
+            with row[0]:
+                st.markdown(f"<span class='tiny'><b>{f.name}</b></span>", unsafe_allow_html=True)
+
+            with row[1]:
+                chosen = st.selectbox(
+                    "Platform",
+                    PLATFORM_CHOICES,
+                    key=f"platform_{f.name}",
+                    label_visibility="collapsed",
+                )
+                platform_selection[f.name] = chosen
+
+            if chosen == "בחר פלטפורמה...":
+                all_assigned = False
+else:
+    all_assigned = False
+
+st.write("")
+
+# -----------------------------
 # Controls bar
 # -----------------------------
 with st.container(border=True):
@@ -244,7 +308,7 @@ st.write("")
 # -----------------------------
 # Run section
 # -----------------------------
-can_run = bool(platform_files) and (db_file is not None)
+can_run = bool(platform_files) and (db_file is not None) and all_assigned
 
 with st.container(border=True):
     r1, r2 = st.columns([1, 1], vertical_alignment="center")
@@ -252,7 +316,7 @@ with st.container(border=True):
     with r1:
         st.markdown("<div class='label'>Run</div>", unsafe_allow_html=True)
         st.markdown(
-            f"<span class='chip'>{'Ready to process' if can_run else 'Waiting for files'}</span>",
+            f"<span class='chip'>{'Ready to process' if can_run else 'Waiting for files / platform selection'}</span>",
             unsafe_allow_html=True,
         )
 
@@ -284,7 +348,18 @@ if "result_summary" not in st.session_state:
 # -----------------------------
 if can_run and process_clicked:
     with st.spinner("Processing files..."):
-        platform_payload = [(f.name, f.getvalue()) for f in platform_files]
+        platform_payload = []
+        for f in platform_files:
+            chosen_platform = platform_selection.get(f.name, "בחר פלטפורמה...")
+            token = PLATFORM_TOKEN.get(chosen_platform, "")
+            base = Path(f.name).stem
+            ext = Path(f.name).suffix
+
+            # build synthetic name: {base}_{platform}[_{vod}].{ext}
+            synthetic = f"{base}_{token}{ext}" if token else f.name
+
+            platform_payload.append((synthetic, f.getvalue()))
+
         result = run_pipeline_and_zip(
             platform_files=platform_payload,
             db_excel_bytes=db_file.getvalue(),
@@ -292,6 +367,7 @@ if can_run and process_clicked:
             include_intermediate=include_intermediate,
             month_str=selected_month_str,
         )
+
     st.session_state["result_zip"] = result.zip_bytes
     st.session_state["result_summary"] = result.summary
 
@@ -315,7 +391,10 @@ if st.session_state["result_zip"]:
             "- Optional (if enabled): `cleaned_*.xlsx`, `mapped_*.xlsx`"
         )
 else:
-    st.info("Upload platform files + mapping (KeshetTV) file, choose month, then click **Process**.")
+    if platform_files and not all_assigned:
+        st.info("Please choose a platform for every uploaded platform file to enable processing.")
+    else:
+        st.info("Upload platform files + mapping (KeshetTV) file, choose month, then click **Process**.")
 
 # -----------------------------
 # Footer trademark
