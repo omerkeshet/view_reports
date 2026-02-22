@@ -160,7 +160,7 @@ def _decide_program_col(file_name: str) -> Optional[str]:
     file_name_upper = file_name.upper()
 
     if "פרטנר" in file_name:
-        return "שם תוכן"
+        return "שם תוכנית"
     if "יס" in file_name:
         return "תאור אירוע"
     if "screenil" in file_name_lower:
@@ -339,7 +339,7 @@ def _decide_template_program_col(file_name: str) -> Optional[str]:
     file_name_upper = file_name.upper()
 
     if "פרטנר" in file_name:
-        return "שם תוכן"
+        return "שם תוכנית"
     if "יס" in file_name:
         return "תאור אירוע"
     if "screenil" in file_name_lower:
@@ -373,7 +373,7 @@ def _decide_viewers_col(file_name: str) -> Optional[str]:
     file_name_upper = file_name.upper()
 
     if "פרטנר" in file_name:
-        return 'סה"כ צפיות'
+        return "כמות צפיות"
     if "יס" in file_name:
         return "כמות הזמנות"
     if "screenil" in file_name_lower:
@@ -447,13 +447,10 @@ def fill_template_files(
 
         # column existence checks like your script
         if program_col not in mapped_df.columns:
-            print(f"SKIP: program_col '{program_col}' not in {list(mapped_df.columns)}")
             continue
         if mapped_house_col not in mapped_df.columns:
-            print(f"SKIP: house_col '{mapped_house_col}' not in {list(mapped_df.columns)}")
             continue
         if viewers_col not in mapped_df.columns:
-            print(f"SKIP: viewers_col '{viewers_col}' not in {list(mapped_df.columns)}")
             continue
 
         # Load a fresh copy of template
