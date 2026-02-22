@@ -447,10 +447,13 @@ def fill_template_files(
 
         # column existence checks like your script
         if program_col not in mapped_df.columns:
+            print(f"SKIP: program_col '{program_col}' not in {list(mapped_df.columns)}")
             continue
         if mapped_house_col not in mapped_df.columns:
+            print(f"SKIP: house_col '{mapped_house_col}' not in {list(mapped_df.columns)}")
             continue
         if viewers_col not in mapped_df.columns:
+            print(f"SKIP: viewers_col '{viewers_col}' not in {list(mapped_df.columns)}")
             continue
 
         # Load a fresh copy of template
