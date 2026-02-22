@@ -91,15 +91,20 @@ def clean_input_files_to_excels(
 
             for sheet_name, sheet_df in all_sheets.items():
                 df = sheet_df.copy()
-
-                table_start = _find_table_start(df)
-                if table_start is None:
-                    continue
-
-                df = df.iloc[table_start:].reset_index(drop=True)
-                df = _filter_rows(df)
-                df = _finalize_cleaned(df)
-
+            
+                if "פרטנר" in original_name:
+                    # New פרטנר format: clean 2-column file, no table detection needed
+                    df = df.dropna(how="all").reset_index(drop=True)
+                    df = _finalize_cleaned(df)
+                else:
+                    table_start = _find_table_start(df)
+                    if table_start is None:
+                        continue
+            
+                    df = df.iloc[table_start:].reset_index(drop=True)
+                    df = _filter_rows(df)
+                    df = _finalize_cleaned(df)
+            
                 if len(df) <= 15:
                     continue
 
