@@ -373,7 +373,7 @@ def _decide_viewers_col(file_name: str) -> Optional[str]:
     file_name_upper = file_name.upper()
 
     if "פרטנר" in file_name:
-        return "סה"כ צפיות"
+        return 'סה"כ צפיות'
     if "יס" in file_name:
         return "כמות הזמנות"
     if "screenil" in file_name_lower:
